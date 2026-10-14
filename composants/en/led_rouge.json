@@ -1,0 +1,68 @@
+{
+  "format": "paillasse-composant",
+  "version": 1,
+  "id": "led_rouge_5mm",
+  "nom": "Red LED 5 mm",
+  "description": "Red LED: 2.0 V at 20 mA, 30 mA at most",
+  "categorie": "Semiconductors",
+  "repere": "D",
+  "sources": [
+    "Typical values of a 5 mm red LED (AlGaInP): VF 2.0 V at IF 20 mA; IF max 30 mA"
+  ],
+  "broches": [
+    {
+      "nom": "anode",
+      "libelle": "A",
+      "cote": "gauche"
+    },
+    {
+      "nom": "cathode",
+      "libelle": "K",
+      "cote": "droite"
+    }
+  ],
+  "parametres": [
+    {
+      "nom": "vf",
+      "libelle": "Forward voltage",
+      "unite": "V",
+      "defaut": 2.0,
+      "min": 1,
+      "max": 4
+    },
+    {
+      "nom": "if_nom",
+      "libelle": "Current of the forward voltage",
+      "unite": "A",
+      "defaut": 0.02,
+      "min": 0.001
+    },
+    {
+      "nom": "if_max",
+      "libelle": "Maximum current",
+      "unite": "A",
+      "defaut": 0.03,
+      "min": 0.001
+    }
+  ],
+  "elements": [
+    {
+      "type": "D",
+      "nom": "jonction",
+      "entre": [
+        "anode",
+        "cathode"
+      ],
+      "vf": "vf",
+      "if": "if_nom",
+      "n": 2.2,
+      "imax": "if_max"
+    }
+  ],
+  "equations": [
+    "eclat = sat(i_jonction / if_nom, 0, 1)"
+  ],
+  "affichage": [
+    "i_jonction"
+  ]
+}

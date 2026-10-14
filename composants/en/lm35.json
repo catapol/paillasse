@@ -1,0 +1,101 @@
+{
+  "format": "paillasse-composant",
+  "version": 1,
+  "id": "lm35",
+  "nom": "LM35",
+  "description": "Analog temperature sensor: 10 mV/°C, 0 V at 0 °C",
+  "categorie": "Sensors",
+  "repere": "U",
+  "sources": [
+    "Texas Instruments, LM35 Precision Centigrade Temperature Sensors (SNIS159H)",
+    "Gain 10 mV/°C, output voltage 0 mV + 10 mV/°C (Electrical Characteristics)",
+    "Supply 4 V to 30 V; quiescent current 56 µA typical at 25 °C; output impedance 0.1 Ω typical at 1 mA"
+  ],
+  "broches": [
+    {
+      "nom": "vs",
+      "libelle": "+Vs",
+      "cote": "gauche"
+    },
+    {
+      "nom": "gnd",
+      "libelle": "GND",
+      "cote": "gauche"
+    },
+    {
+      "nom": "vout",
+      "libelle": "VOUT",
+      "cote": "droite"
+    }
+  ],
+  "entrees": [
+    {
+      "nom": "temperature",
+      "libelle": "Temperature",
+      "unite": "°C",
+      "defaut": 25,
+      "min": -55,
+      "max": 150
+    }
+  ],
+  "parametres": [
+    {
+      "nom": "gain",
+      "libelle": "Sensitivity",
+      "unite": "V/°C",
+      "defaut": 0.01,
+      "source": "10 mV/°C"
+    },
+    {
+      "nom": "courant_repos",
+      "libelle": "Quiescent current",
+      "unite": "A",
+      "defaut": 5.6e-05,
+      "min": 0,
+      "source": "56 µA typique"
+    },
+    {
+      "nom": "r_sortie",
+      "libelle": "Output impedance",
+      "unite": "Ω",
+      "defaut": 0.1,
+      "min": 0.001,
+      "source": "0,1 Ω typique"
+    }
+  ],
+  "alimentation": {
+    "plus": "vs",
+    "moins": "gnd",
+    "min": 4,
+    "max": 30
+  },
+  "equations": [
+    "# Montage de base (sans tension négative) : la sortie ne descend pas sous 0 V.",
+    "vsortie = si(alim_ok, sat(gain * temperature, 0, v_alim - 1), 0)"
+  ],
+  "elements": [
+    {
+      "type": "I",
+      "nom": "repos",
+      "entre": [
+        "vs",
+        "gnd"
+      ],
+      "valeur": "si(v_alim > 0.5, courant_repos, 0)"
+    },
+    {
+      "type": "V",
+      "nom": "sortie",
+      "entre": [
+        "vout",
+        "gnd"
+      ],
+      "valeur": "vsortie",
+      "r": "r_sortie"
+    }
+  ],
+  "affichage": [
+    "temperature",
+    "vsortie"
+  ]
+}

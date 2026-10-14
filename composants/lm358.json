@@ -1,0 +1,227 @@
+{
+  "format": "paillasse-composant",
+  "version": 1,
+  "id": "lm358_demi",
+  "nom": "LM358 (un ampli)",
+  "description": "Amplificateur opérationnel, alimentation unique : gain 100 dB, 1 MHz, sortie jusqu'à V+ − 1,5 V",
+  "categorie": "Amplificateurs",
+  "repere": "U",
+  "sources": [
+    "Texas Instruments, LMx58 Dual Operational Amplifiers (SLOS068)",
+    "Gain en boucle ouverte 100 dB typique ; produit gain-bande 0,7 à 1 MHz",
+    "Sortie : de 0 V environ à V+ − 1,5 V ; alimentation 3 V à 32 V ; courant 0,35 mA par ampli"
+  ],
+  "broches": [
+    {
+      "nom": "inp",
+      "libelle": "IN+",
+      "cote": "gauche"
+    },
+    {
+      "nom": "inm",
+      "libelle": "IN−",
+      "cote": "gauche"
+    },
+    {
+      "nom": "vcc",
+      "libelle": "V+",
+      "cote": "gauche"
+    },
+    {
+      "nom": "gnd",
+      "libelle": "GND",
+      "cote": "gauche"
+    },
+    {
+      "nom": "out",
+      "libelle": "OUT",
+      "cote": "droite"
+    }
+  ],
+  "noeuds": [
+    "n1",
+    "haut",
+    "haut1",
+    "bas"
+  ],
+  "parametres": [
+    {
+      "nom": "gain_bo",
+      "libelle": "Gain en boucle ouverte",
+      "unite": "",
+      "defaut": 100000,
+      "min": 1
+    },
+    {
+      "nom": "gbw",
+      "libelle": "Produit gain-bande",
+      "unite": "Hz",
+      "defaut": 1000000.0,
+      "min": 1
+    },
+    {
+      "nom": "marge_haute",
+      "libelle": "Écart de la sortie sous V+",
+      "unite": "V",
+      "defaut": 1.5,
+      "min": 0
+    },
+    {
+      "nom": "r_sortie",
+      "libelle": "Résistance de sortie",
+      "unite": "Ω",
+      "defaut": 50,
+      "min": 0.1
+    }
+  ],
+  "alimentation": {
+    "plus": "vcc",
+    "moins": "gnd",
+    "min": 3,
+    "max": 32
+  },
+  "equations": [
+    "# un pôle : gain_bo · 1 MΩ sur n1, condensateur réglé pour que le gain tombe à 1 à gbw",
+    "const rp = 1e6",
+    "const cp = gain_bo / (2 * pi * gbw * rp)"
+  ],
+  "elements": [
+    {
+      "type": "R",
+      "entre": [
+        "inp",
+        "inm"
+      ],
+      "valeur": "10e6"
+    },
+    {
+      "type": "G",
+      "nom": "etage",
+      "entre": [
+        "gnd",
+        "n1"
+      ],
+      "commande": [
+        "inp",
+        "inm"
+      ],
+      "gain": "gain_bo / rp"
+    },
+    {
+      "type": "R",
+      "entre": [
+        "n1",
+        "gnd"
+      ],
+      "valeur": "rp"
+    },
+    {
+      "type": "C",
+      "entre": [
+        "n1",
+        "gnd"
+      ],
+      "valeur": "cp"
+    },
+    {
+      "type": "G",
+      "nom": "sortie",
+      "entre": [
+        "gnd",
+        "out"
+      ],
+      "commande": [
+        "n1",
+        "gnd"
+      ],
+      "gain": "1 / r_sortie"
+    },
+    {
+      "type": "R",
+      "entre": [
+        "out",
+        "gnd"
+      ],
+      "valeur": "r_sortie"
+    },
+    {
+      "type": "V",
+      "entre": [
+        "haut",
+        "vcc"
+      ],
+      "valeur": "-marge_haute - 0.3",
+      "r": 1
+    },
+    {
+      "type": "V",
+      "entre": [
+        "haut1",
+        "vcc"
+      ],
+      "valeur": "-marge_haute - 0.2",
+      "r": 1
+    },
+    {
+      "type": "V",
+      "entre": [
+        "bas",
+        "gnd"
+      ],
+      "valeur": 0.3,
+      "r": 1
+    },
+    {
+      "type": "D",
+      "entre": [
+        "out",
+        "haut"
+      ],
+      "vf": 0.3,
+      "if": 0.01,
+      "n": 0.5
+    },
+    {
+      "type": "D",
+      "entre": [
+        "bas",
+        "out"
+      ],
+      "vf": 0.3,
+      "if": 0.01,
+      "n": 0.5
+    },
+    {
+      "type": "D",
+      "entre": [
+        "n1",
+        "haut1"
+      ],
+      "vf": 0.3,
+      "if": 0.01,
+      "n": 0.5
+    },
+    {
+      "type": "D",
+      "entre": [
+        "bas",
+        "n1"
+      ],
+      "vf": 0.3,
+      "if": 0.01,
+      "n": 0.5
+    },
+    {
+      "type": "I",
+      "nom": "repos",
+      "entre": [
+        "vcc",
+        "gnd"
+      ],
+      "valeur": "si(v_alim > 1, 0.35e-3, 0)"
+    }
+  ],
+  "affichage": [
+    "v_out"
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "format": "paillasse-composant",
+  "version": 1,
+  "id": "gp2y0a21",
+  "nom": "Sharp GP2Y0A21YK0F",
+  "description": "Capteur de distance infrarouge 10 à 80 cm, sortie analogique non linéaire",
+  "categorie": "Capteurs",
+  "repere": "IR",
+  "sources": [
+    "Sharp GP2Y0A21YK0F, fiche technique : portée 10 à 80 cm ; alimentation 4,5 à 5,5 V ; courant 30 mA typique",
+    "Courbe de sortie (lue sur le graphique de la fiche) : environ 2,3 V à 10 cm et 0,4 V à 80 cm. Approximée ici par V = 33,9 / (d + 4,74), d en cm, qui passe par ces deux points ; valeurs intermédiaires à vérifier (environ 0,98 V à 30 cm)",
+    "Période de mesure 38,3 ms ± 9,6 ms"
+  ],
+  "broches": [
+    {
+      "nom": "vcc",
+      "libelle": "Vcc",
+      "cote": "gauche"
+    },
+    {
+      "nom": "gnd",
+      "libelle": "GND",
+      "cote": "gauche"
+    },
+    {
+      "nom": "vo",
+      "libelle": "Vo",
+      "cote": "droite"
+    }
+  ],
+  "parametres": [
+    {
+      "nom": "periode",
+      "libelle": "Période de mesure",
+      "unite": "s",
+      "defaut": 0.0383,
+      "min": 0.001
+    },
+    {
+      "nom": "courant",
+      "libelle": "Courant consommé",
+      "unite": "A",
+      "defaut": 0.03,
+      "min": 0
+    }
+  ],
+  "alimentation": {
+    "plus": "vcc",
+    "moins": "gnd",
+    "min": 4.5,
+    "max": 5.5
+  },
+  "monde": {
+    "mesure": "distance",
+    "portee_m": 1.5,
+    "ouverture_deg": 5,
+    "defaut": 0.3
+  },
+  "equations": [
+    "d_cm = sat(distance * 100, 10, 80)",
+    "v_mesure = echantillon(33.9 / (d_cm + 4.74), periode)",
+    "vsortie = si(alim_ok, v_mesure, 0)"
+  ],
+  "elements": [
+    {
+      "type": "I",
+      "entre": [
+        "vcc",
+        "gnd"
+      ],
+      "valeur": "si(v_alim > 1, courant, 0)"
+    },
+    {
+      "type": "V",
+      "entre": [
+        "vo",
+        "gnd"
+      ],
+      "valeur": "vsortie",
+      "r": 100
+    }
+  ],
+  "affichage": [
+    "distance",
+    "vsortie"
+  ]
+}

@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdint.h>
+int main(void) {
+  int8_t a = 127; a++; printf("%d\n", a);
+  uint8_t b = 0; b--; printf("%d\n", b);
+  int16_t c = 32767; c += 1; printf("%d\n", c);
+  uint16_t d = 65535; d += 2; printf("%u\n", d);
+  int32_t e = 2147483647; e = (int32_t)((uint32_t)e + 1u); printf("%d\n", e);
+  uint32_t f = 0; f -= 1; printf("%u\n", f);
+  printf("%d %d %d %d\n", 7 / 2, -7 / 2, 7 / -2, -7 / -2);
+  printf("%d %d %d %d\n", 7 % 3, -7 % 3, 7 % -3, -7 % -3);
+  printf("%u\n", 4000000000u / 3u);
+  printf("%u\n", 4000000000u % 7u);
+  printf("%d\n", (int)(3000000000u));
+  printf("%d\n", -1 < 1u);
+  printf("%d\n", (int8_t)200);
+  printf("%d\n", (uint8_t)-1);
+  printf("%d\n", (int16_t)70000);
+  printf("%d %d\n", 1 << 10, -16 >> 2);
+  printf("%u\n", 0x80000000u >> 31);
+  printf("%d\n", ~5);
+  printf("%u\n", ~5u);
+  printf("%d\n", 0xF0 & 0x3C | 0x01 ^ 0x10);
+  int x = 5; x += 3; x *= 2; x -= 1; x /= 3; x %= 4; x <<= 3; x >>= 1; x |= 0x10; x &= 0x1C; x ^= 0x05;
+  printf("%d\n", x);
+  uint8_t u = 250; u += 10; printf("%d\n", u);
+  int8_t s = -128; s = -s; printf("%d\n", s);
+  short sh = 300; char ch = (char)sh; printf("%d\n", ch);
+  unsigned char uc = 200; int prom = uc + uc; printf("%d\n", prom);
+  int i = 5; int j = i++; int k2 = ++i; printf("%d %d %d\n", i, j, k2);
+  printf("%d\n", 5 > 3 && 2 > 1 || 0);
+  printf("%d\n", !5 + !0);
+  printf("%d\n", 100 * 100 * 100);
+  uint16_t m = 60000; uint16_t n = 60000; uint32_t p = m * n; printf("%u\n", p);
+  int64_t big = 1; for (int k = 0; k < 40; k++) big *= 3; printf("%lld\n", (long long)big);
+  uint64_t ub = 0xFFFFFFFFFFFFFFFFull; ub += 2; printf("%llu\n", (unsigned long long)ub);
+  int64_t q = -1000000000000LL / 7; printf("%lld %lld\n", (long long)q, (long long)(-1000000000000LL % 7));
+  printf("%lld\n", (long long)((int64_t)1 << 40));
+  printf("%llu\n", (unsigned long long)(0x8000000000000000ull >> 60));
+  printf("%d\n", (int)(big % 1000));
+  printf("%d\n", (int)((int64_t)123456789 * 987654321 >> 20));
+  int64_t neg = -5; printf("%d\n", neg < 3);
+  printf("%lld\n", (long long)(neg * neg * neg));
+  unsigned un = 10; int sg = -20; printf("%d\n", un + sg > 0);
+  printf("%d\n", (int)sizeof(int8_t) + (int)sizeof(int16_t) * 10 + (int)sizeof(int32_t) * 100 + (int)sizeof(int64_t) * 1000);
+  printf("%d\n", 0x7FFFFFFF + 0);
+  printf("%d %d\n", 010, 0b1010);
+  printf("%d\n", 'A' + 1);
+  printf("%c%c\n", 'a' - 32, 72);
+  int z = 0; z = z ? 1 : 2; printf("%d\n", z);
+  printf("%d\n", (1, 2, 3));
+  return 0;
+}

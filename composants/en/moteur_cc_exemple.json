@@ -1,0 +1,109 @@
+{
+  "format": "paillasse-composant",
+  "version": 1,
+  "id": "moteur_cc_exemple",
+  "nom": "DC motor (equation model)",
+  "description": "DC motor described by its equations: winding R, L and back-EMF K·ω",
+  "categorie": "Actuators",
+  "repere": "M",
+  "sources": [
+    "Example values of a small 3 V motor: R = 3 Ω, L = 2 mH, K = 0.01 V·s/rad, J = 1e-6 kg·m²"
+  ],
+  "broches": [
+    {
+      "nom": "plus",
+      "libelle": "+",
+      "cote": "gauche"
+    },
+    {
+      "nom": "moins",
+      "libelle": "−",
+      "cote": "gauche"
+    }
+  ],
+  "noeuds": [
+    "m"
+  ],
+  "entrees": [
+    {
+      "nom": "charge",
+      "libelle": "Load torque",
+      "unite": "N·m",
+      "defaut": 0
+    }
+  ],
+  "sorties": [
+    {
+      "nom": "vitesse",
+      "libelle": "Speed",
+      "unite": "rpm"
+    }
+  ],
+  "parametres": [
+    {
+      "nom": "r_bob",
+      "libelle": "Resistance",
+      "unite": "Ω",
+      "defaut": 3,
+      "min": 0.01
+    },
+    {
+      "nom": "l_bob",
+      "libelle": "Inductance",
+      "unite": "H",
+      "defaut": 0.002,
+      "min": 1e-06
+    },
+    {
+      "nom": "k",
+      "libelle": "Constant K",
+      "unite": "V·s/rad",
+      "defaut": 0.01,
+      "min": 1e-05
+    },
+    {
+      "nom": "j",
+      "libelle": "Inertia",
+      "unite": "kg·m²",
+      "defaut": 1e-06,
+      "min": 1e-09
+    },
+    {
+      "nom": "f",
+      "libelle": "Viscous friction",
+      "unite": "N·m·s",
+      "defaut": 1e-06,
+      "min": 0
+    }
+  ],
+  "equations": [
+    "couple = k * i_bobinage - f * w - charge",
+    "w = integ(couple / j)",
+    "vitesse = w * 30 / pi"
+  ],
+  "elements": [
+    {
+      "type": "L",
+      "nom": "bobinage",
+      "entre": [
+        "plus",
+        "m"
+      ],
+      "valeur": "l_bob",
+      "r": "r_bob"
+    },
+    {
+      "type": "V",
+      "nom": "fcem",
+      "entre": [
+        "m",
+        "moins"
+      ],
+      "valeur": "k * w",
+      "r": 0.001
+    }
+  ],
+  "affichage": [
+    "vitesse"
+  ]
+}

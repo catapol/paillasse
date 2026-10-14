@@ -1,0 +1,201 @@
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="5" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 11h3l2-4 2 8 2-4h3" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <span class="brand-name">Paillasse</span>
+    </div>
+    <input id="montageName" class="name-input" aria-label="Nom du montage" data-en-aria="Circuit name" value="">
+    <div class="views" role="tablist" aria-label="Pages">
+      <button class="view" role="tab" data-page="schema" aria-selected="true" title="Page Schéma (F2 pour basculer)" data-en-title="Schematic page (F2 to switch)" data-en="Schematic">Schéma</button>
+      <button class="view" role="tab" data-page="code" aria-selected="false" title="Page Programme (F2 pour basculer)" data-en-title="Program page (F2 to switch)"><span data-en="Program">Programme</span> <span id="codeBadge" class="badge err" hidden>!</span></button>
+      <button class="view" role="tab" data-page="monde" aria-selected="false" title="Le terrain où roulent les robots" data-en-title="The field where robots drive" data-en="World">Monde</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="group">
+      <button id="btnRun" class="btn primary" title="Barre d'espace" data-en-title="Space bar">▶ Lancer</button>
+      <button id="btnReset" class="btn" title="Réinitialiser : remettre le montage à t = 0" data-en-title="Reset: back to t = 0" aria-label="Réinitialiser" data-en-aria="Reset">↺<span class="lbl" data-en="Reset">Réinitialiser</span></button>
+      <select id="speed" class="btn" aria-label="Vitesse de simulation" data-en-aria="Simulation speed" title="Vitesse de simulation : × 1 est le temps réel, les petites valeurs donnent un ralenti" data-en-title="Simulation speed: × 1 is real time, small values give slow motion">
+        <option value="0.001" data-en="× 0.001">× 0,001</option>
+        <option value="0.01" data-en="× 0.01">× 0,01</option>
+        <option value="0.1" data-en="× 0.1">× 0,1</option>
+        <option value="0.25" data-en="× 0.25">× 0,25</option>
+        <option value="0.5" data-en="× 0.5">× 0,5</option>
+        <option value="1" selected>× 1</option>
+        <option value="2">× 2</option>
+        <option value="5">× 5</option>
+        <option value="max">max</option>
+      </select>
+      <span class="clockbox"><span id="clock" class="clock">t = <b>0,000 s</b></span><span id="rate" class="rate"></span></span>
+      <button id="status" class="pill ok" data-en="circuit OK">montage correct</button>
+    </div>
+    <div class="group">
+      <button id="btnSample" class="btn small" data-en="Examples">Exemples</button>
+      <div class="menu" id="menuMontage">
+        <button id="btnMenu" class="btn small" aria-haspopup="true" aria-expanded="false" aria-controls="menuList" title="Importer, exporter ou vider le montage" data-en-title="Import, export or clear the circuit" data-en="Circuit ▾">Montage ▾</button>
+        <div class="menu-list" id="menuList" role="menu" hidden>
+          <button id="btnImport" class="btn small" role="menuitem" data-en="Import…">Importer…</button>
+          <button id="btnExport" class="btn small" role="menuitem" data-en="Export…">Exporter…</button>
+          <button id="btnClear" class="btn small danger" role="menuitem" title="Effacer tout le montage" data-en-title="Delete the whole circuit" data-en="Clear">Vider</button>
+        </div>
+      </div>
+      <button id="btnDons" class="btn small" hidden title="Paillasse est gratuit : soutenir son développement" data-en-title="Paillasse is free: support its development" data-en-html="♥<span class=&quot;lbl&quot;> Support</span>">♥<span class="lbl"> Soutenir</span></button>
+      <button id="btnLang" class="btn small" title="English version" data-en-title="Version française" data-en="FR">EN</button>
+      <button id="btnAide" class="btn small" title="Mode d'emploi et limites du simulateur" data-en-title="User guide and limits of the simulator" aria-label="Mode d'emploi" data-en-aria="User guide">?</button>
+    </div>
+  </header>
+
+  <main class="pages">
+  <div class="work" id="pageSchema">
+    <aside class="panel palette" id="palette" aria-label="Composants" data-en-aria="Components"></aside>
+
+    <section class="center">
+      <div class="panel sheet-wrap" id="sheetWrap">
+        <div class="sheet-tools">
+          <button class="btn small" id="zoomOut" aria-label="Dézoomer" data-en-aria="Zoom out" title="Dézoomer (touche −)" data-en-title="Zoom out (− key)">−</button>
+          <button class="btn small zoom-pct" id="zoomPct" title="Revenir à 100 % (touche 1)" data-en-title="Back to 100 % (1 key)">100 %</button>
+          <button class="btn small" id="zoomIn" aria-label="Zoomer" data-en-aria="Zoom in" title="Zoomer (touche +)" data-en-title="Zoom in (+ key)">+</button>
+          <button class="btn small" id="zoomFit" title="Afficher tout le montage (touche 0)" data-en-title="Show the whole circuit (0 key)" data-en="Fit all">Tout afficher</button>
+          <button class="btn small primary only-phone" id="btnPal" aria-expanded="false" aria-controls="palette" data-en="+ Component">+ Composant</button>
+        </div>
+        <div class="sheet-info" id="sheetInfo"></div>
+        <svg class="sheet" id="sheet" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="gMinor" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="var(--grid-minor)" stroke-width="0.8"/></pattern>
+            <pattern id="gMajor" width="50" height="50" patternUnits="userSpaceOnUse"><rect width="50" height="50" fill="url(#gMinor)"/><path d="M50 0H0V50" fill="none" stroke="var(--grid-major)" stroke-width="1"/></pattern>
+          </defs>
+          <rect id="sheetBg" x="0" y="0" width="100" height="100" fill="url(#gMajor)"/>
+          <g id="wiresLayer"></g>
+          <g id="compsLayer"></g>
+          <path id="rubber" class="rubber" d=""/>
+        </svg>
+      </div>
+
+      <div class="panel dock">
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" data-tab="scope" aria-selected="true" data-en="Oscilloscope">Oscilloscope</button>
+          <button class="tab" role="tab" data-tab="serial" aria-selected="false"><span data-en="Serial port">Port série</span> <span id="serialBadge" class="badge" hidden>0</span></button>
+          <button class="tab" role="tab" data-tab="bus" aria-selected="false" title="Échanges I2C, SPI et UART, octet par octet" data-en-title="I2C, SPI and UART exchanges, byte by byte">Bus <span id="busBadge" class="badge" hidden>0</span></button>
+          <button class="tab" role="tab" data-tab="check" aria-selected="false"><span data-en="Check">Vérification</span> <span id="checkBadge" class="badge" hidden>0</span></button>
+          <div class="tab-tools" id="scopeTools">
+            <label id="trigBox" class="trig" title="Cale l'image sur un front montant de la première courbe, comme le déclenchement d'un oscilloscope" data-en-title="Locks the display on a rising edge of the first trace, like an oscilloscope trigger" hidden><input type="checkbox" id="trig" checked> <span data-en="stable display">image stable</span></label>
+            <label for="win" data-en="Window">Fenêtre</label>
+            <select id="win" class="btn small">
+              <option value="0.002">2 ms</option>
+              <option value="0.01">10 ms</option>
+              <option value="0.05">50 ms</option>
+              <option value="0.2">200 ms</option>
+              <option value="1">1 s</option>
+              <option value="5">5 s</option>
+              <option value="10" selected>10 s</option>
+              <option value="30">30 s</option>
+              <option value="120">2 min</option>
+            </select>
+          </div>
+        </div>
+        <div class="pane" data-pane="scope" id="scopeWrap">
+          <div class="empty" id="scopeEmpty" data-en-html="Run the simulation to see the signals. Each terminal ticked in the inspector and each call to &lt;code&gt;trace()&lt;/code&gt; in the program adds a trace.">Lancez la simulation pour voir les signaux. Chaque borne cochée dans l'inspecteur et chaque appel à <code>trace()</code> dans le programme ajoute une courbe.</div>
+          <canvas class="scope" id="scope" hidden></canvas>
+        </div>
+        <div class="pane" data-pane="serial" hidden><pre class="serial" id="serial"></pre></div>
+        <div class="pane" data-pane="bus" hidden><pre class="serial" id="busLog"></pre></div>
+        <div class="pane" data-pane="check" hidden><ul class="issues" id="issues"></ul></div>
+      </div>
+    </section>
+
+    <aside class="panel inspector" id="inspector" aria-label="Inspecteur" data-en-aria="Inspector"></aside>
+  </div>
+
+  <div class="code-page" id="pageCode" hidden>
+    <section class="panel editor-panel" aria-label="Programme" data-en-aria="Program">
+      <div class="code-bar">
+        <label for="mcuPick" data-en="Program of">Programme de</label>
+        <select id="mcuPick" class="btn small"></select>
+        <button class="code-status ok" id="codeStatus" disabled></button>
+        <span id="codeStale" class="stale" hidden data-en="Modified: restart to apply">Modifié : relancez pour appliquer</span>
+        <span class="bar-tools">
+          <button class="btn small" id="btnIndent" title="Remettre toute l'indentation au propre (Maj+Alt+F)" data-en-title="Clean up all indentation (Shift+Alt+F)" data-en="Reindent">Réindenter</button>
+          <button class="btn small" id="btnFind" title="Rechercher dans le programme (Ctrl+F)" data-en-title="Search the program (Ctrl+F)" data-en="Search">Rechercher</button>
+          <button class="btn small" id="fontMinus" aria-label="Texte plus petit" data-en-aria="Smaller text" title="Texte plus petit" data-en-title="Smaller text">A−</button>
+          <button class="btn small" id="fontPlus" aria-label="Texte plus grand" data-en-aria="Larger text" title="Texte plus grand" data-en-title="Larger text">A+</button>
+          <button class="btn small" id="btnHelp" data-en="Language help">Aide du langage</button>
+        </span>
+      </div>
+      <div class="cm-host" id="cmHost"></div>
+      <div class="empty" id="codeEmpty" hidden data-en="No programmable component on the schematic. Add a microcontroller (in C) or an FPGA (in VHDL) from the Schematic page to write its program.">Aucun composant programmable sur le schéma. Ajoutez un microcontrôleur (en C) ou un FPGA (en VHDL) depuis la page Schéma pour écrire son programme.</div>
+      <div class="code-foot" id="codeFoot">
+        <span id="codePos" data-en="Line 1, column 1">Ligne 1, colonne 1</span>
+        <span class="foot-keys" data-en="Ctrl+Space: completion, Tab to accept · Ctrl+/: comment · Ctrl+F: search · F2: schematic">Ctrl+Espace : complétion, Tab pour l'accepter · Ctrl+/ : commenter · Ctrl+F : chercher · F2 : schéma</span>
+      </div>
+    </section>
+    <aside class="code-side">
+      <section class="panel side-box" id="pinsBox" aria-label="Broches" data-en-aria="Pins"></section>
+      <section class="panel side-box serial-box" aria-label="Port série" data-en-aria="Serial port">
+        <div class="side-head"><span class="label" data-en="Serial port">Port série</span><button class="btn small" id="serialClear" data-en="Clear">Effacer</button></div>
+        <div class="serial-scroll"><pre class="serial" id="serial2"></pre></div>
+      </section>
+    </aside>
+  </div>
+
+  <div class="monde-page" id="pageMonde" hidden>
+    <section class="panel monde-wrap">
+      <div class="monde-tools" role="toolbar" aria-label="Outils du terrain" data-en-aria="Field tools">
+        <button class="btn small" data-mtool="choisir" title="Choisir et déplacer (V)" data-en-title="Select and move (V)" data-en="Select">Choisir</button>
+        <button class="btn small" data-mtool="mur" title="Dessiner un mur (M)" data-en-title="Draw a wall (M)" data-en="Wall">Mur</button>
+        <button class="btn small" data-mtool="boite" title="Dessiner une boîte (B)" data-en-title="Draw a box (B)" data-en="Box">Boîte</button>
+        <button class="btn small" data-mtool="rond" title="Dessiner un obstacle rond (O)" data-en-title="Draw a round obstacle (O)" data-en="Round">Rond</button>
+        <button class="btn small" data-mtool="balle" title="Poser une balle qui roule et rebondit (A)" data-en-title="Place a ball that rolls and bounces (A)" data-en="Ball">Balle</button>
+        <button class="btn small" data-mtool="ligne" title="Tracer une ligne au sol (L)" data-en-title="Draw a line on the floor (L)" data-en="Floor line">Ligne au sol</button>
+        <span class="m-sep" aria-hidden="true"></span>
+        <button class="btn small" data-mtool="bras" title="Dessiner un bras articulable (R)" data-en-title="Draw an arm that can be jointed (R)" data-en="Arm">Bras</button>
+        <button class="btn small" data-mtool="pivot" title="Poser un pivot sur une pièce libre (P)" data-en-title="Place a pivot on a free part (P)" data-en="Pivot">Pivot</button>
+        <button class="btn small" data-mtool="glissiere" title="Poser une glissière sur une pièce libre (S)" data-en-title="Place a slider on a free part (S)" data-en="Slider">Glissière</button>
+        <span class="m-sep" aria-hidden="true"></span>
+        <button class="btn small" data-mtool="gomme" title="Effacer une pièce ou une articulation (G)" data-en-title="Delete a part or a joint (G)" data-en="Eraser">Gomme</button>
+        <select id="mondeModele" class="btn small" aria-label="Terrain tout prêt" data-en-aria="Ready-made field">
+          <option value="" data-en="Ready-made field…">Terrain tout prêt…</option>
+          <option value="ovale" data-en="Oval track (line follower)">Piste ovale (suiveur de ligne)</option>
+          <option value="huit" data-en="Figure-eight track">Piste en huit</option>
+          <option value="arene" data-en="Arena with obstacles">Arène avec obstacles</option>
+          <option value="labyrinthe" data-en="Maze">Labyrinthe</option>
+          <option value="vide" data-en="Empty field">Terrain vide</option>
+        </select>
+        <span class="spacer"></span>
+        <button class="btn small" id="mZoomOut" aria-label="Dézoomer" data-en-aria="Zoom out">−</button>
+        <button class="btn small" id="mZoomIn" aria-label="Zoomer" data-en-aria="Zoom in">+</button>
+        <button class="btn small" id="mZoomFit" title="Tout le terrain (touche 0)" data-en-title="Whole field (0 key)" data-en="Fit all">Tout afficher</button>
+      </div>
+      <div class="monde-view">
+        <svg class="monde" id="mondeSvg" xmlns="http://www.w3.org/2000/svg">
+          <g transform="scale(1,-1)">
+            <g id="mFloor"></g><g id="mLines"></g><g id="mObjs"></g><g id="mTrails"></g>
+            <path id="mRays" class="m-rayon" d=""/>
+            <g id="mRobots"></g><g id="mJoints"></g><g id="mHandles"></g><g id="mDraft"></g>
+          </g>
+        </svg>
+        <div class="monde-hint" id="mondeHint"></div>
+        <div class="monde-foot"><span id="mondePos"></span><span class="echelle" id="mondeEchelle">10 cm</span></div>
+      </div>
+    </section>
+    <aside class="panel monde-side inspector" id="mondeSide" aria-label="Réglages du terrain" data-en-aria="Field settings"></aside>
+  </div>
+  </main>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle"></h3>
+    <p class="hint" id="modalHint"></p>
+    <div id="modalBody" class="help" hidden></div>
+    <textarea id="modalText" spellcheck="false"></textarea>
+    <input type="file" id="modalFile" accept=".json,.txt,application/json,text/plain" hidden>
+    <p class="hint err" id="modalErr" hidden></p>
+    <div id="modalExtra" class="modal-extra" hidden></div>
+    <div class="modal-actions">
+      <button class="btn small" id="modalFileBtn" hidden data-en="Choose a file…">Choisir un fichier…</button>
+      <span class="spacer"></span>
+      <button class="btn small" id="modalCancel" data-en="Close">Fermer</button>
+      <button class="btn small primary" id="modalOk"></button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>

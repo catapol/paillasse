@@ -1,0 +1,24 @@
+{
+  "format": "paillasse-composant",
+  "version": 1,
+  "id": "led_rouge_5mm",
+  "nom": "LED rouge 5 mm",
+  "description": "LED rouge : 2,0 V sous 20 mA, 30 mA au plus",
+  "categorie": "Semi-conducteurs",
+  "repere": "D",
+  "sources": [ "Valeurs typiques d'une LED rouge 5 mm (AlGaInP) : VF 2,0 V à IF 20 mA ; IF max 30 mA" ],
+  "broches": [
+    { "nom": "anode", "libelle": "A", "cote": "gauche" },
+    { "nom": "cathode", "libelle": "K", "cote": "droite" }
+  ],
+  "parametres": [
+    { "nom": "vf", "libelle": "Tension directe", "unite": "V", "defaut": 2.0, "min": 1, "max": 4 },
+    { "nom": "if_nom", "libelle": "Courant de la tension directe", "unite": "A", "defaut": 0.02, "min": 0.001 },
+    { "nom": "if_max", "libelle": "Courant maximal", "unite": "A", "defaut": 0.03, "min": 0.001 }
+  ],
+  "elements": [
+    { "type": "D", "nom": "jonction", "entre": ["anode", "cathode"], "vf": "vf", "if": "if_nom", "n": 2.2, "imax": "if_max" }
+  ],
+  "equations": [ "eclat = sat(i_jonction / if_nom, 0, 1)" ],
+  "affichage": ["i_jonction"]
+}

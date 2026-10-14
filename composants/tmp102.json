@@ -1,0 +1,83 @@
+{
+  "format": "paillasse-composant",
+  "version": 1,
+  "id": "tmp102",
+  "nom": "TMP102",
+  "description": "Capteur de température I2C, 12 bits, 0,0625 °C par unité",
+  "categorie": "Capteurs",
+  "repere": "U",
+  "sources": [
+    "Texas Instruments, TMP102 Low-Power Digital Temperature Sensor (SBOS397)",
+    "Résolution 12 bits : 0,0625 °C ; registre de température 0x00, 12 bits cadrés à gauche sur deux octets",
+    "Adresse 0x48 avec ADD0 à la masse ; alimentation 1,4 V à 3,6 V ; courant 10 µA typique bus actif à 400 kHz (4,8 µA bus inactif)"
+  ],
+  "broches": [
+    {
+      "nom": "vcc",
+      "libelle": "V+",
+      "cote": "gauche"
+    },
+    {
+      "nom": "gnd",
+      "libelle": "GND",
+      "cote": "gauche"
+    }
+  ],
+  "entrees": [
+    {
+      "nom": "temperature",
+      "libelle": "Température",
+      "unite": "°C",
+      "defaut": 25,
+      "min": -40,
+      "max": 125
+    }
+  ],
+  "parametres": [
+    {
+      "nom": "courant_repos",
+      "libelle": "Courant de repos",
+      "unite": "A",
+      "defaut": 1e-05,
+      "min": 0
+    }
+  ],
+  "alimentation": {
+    "plus": "vcc",
+    "moins": "gnd",
+    "min": 1.4,
+    "max": 3.6
+  },
+  "equations": [
+    "# mesure arrondie au pas du convertisseur, 0,0625 °C",
+    "temperature_lue = plancher(temperature / 0.0625) * 0.0625"
+  ],
+  "elements": [
+    {
+      "type": "I",
+      "nom": "repos",
+      "entre": [
+        "vcc",
+        "gnd"
+      ],
+      "valeur": "si(v_alim > 0.5, courant_repos, 0)"
+    }
+  ],
+  "serie": {
+    "role": "capteur",
+    "interfaces": [
+      "i2c"
+    ],
+    "valeur": "temperature_lue",
+    "unite": "°C",
+    "resolution": 0.00390625,
+    "octets": 2,
+    "adresse_i2c": "0x48",
+    "registre": 0,
+    "vcc": "vcc",
+    "gnd": "gnd"
+  },
+  "affichage": [
+    "temperature_lue"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "format": "paillasse-composant",
+  "version": 1,
+  "id": "lm35",
+  "nom": "LM35",
+  "description": "Capteur de température analogique : 10 mV/°C, 0 V à 0 °C",
+  "categorie": "Capteurs",
+  "repere": "U",
+  "sources": [
+    "Texas Instruments, LM35 Precision Centigrade Temperature Sensors (SNIS159H)",
+    "Gain 10 mV/°C, tension de sortie 0 mV + 10 mV/°C (Electrical Characteristics)",
+    "Alimentation 4 V à 30 V ; courant de repos 56 µA typique à 25 °C ; impédance de sortie 0,1 Ω typique pour 1 mA"
+  ],
+  "broches": [
+    { "nom": "vs", "libelle": "+Vs", "cote": "gauche" },
+    { "nom": "gnd", "libelle": "GND", "cote": "gauche" },
+    { "nom": "vout", "libelle": "VOUT", "cote": "droite" }
+  ],
+  "entrees": [
+    { "nom": "temperature", "libelle": "Température", "unite": "°C", "defaut": 25, "min": -55, "max": 150 }
+  ],
+  "parametres": [
+    { "nom": "gain", "libelle": "Sensibilité", "unite": "V/°C", "defaut": 0.01, "source": "10 mV/°C" },
+    { "nom": "courant_repos", "libelle": "Courant de repos", "unite": "A", "defaut": 56e-6, "min": 0, "source": "56 µA typique" },
+    { "nom": "r_sortie", "libelle": "Impédance de sortie", "unite": "Ω", "defaut": 0.1, "min": 0.001, "source": "0,1 Ω typique" }
+  ],
+  "alimentation": { "plus": "vs", "moins": "gnd", "min": 4, "max": 30 },
+  "equations": [
+    "# Montage de base (sans tension négative) : la sortie ne descend pas sous 0 V.",
+    "vsortie = si(alim_ok, sat(gain * temperature, 0, v_alim - 1), 0)"
+  ],
+  "elements": [
+    { "type": "I", "nom": "repos", "entre": ["vs", "gnd"], "valeur": "si(v_alim > 0.5, courant_repos, 0)" },
+    { "type": "V", "nom": "sortie", "entre": ["vout", "gnd"], "valeur": "vsortie", "r": "r_sortie" }
+  ],
+  "affichage": ["temperature", "vsortie"]
+}

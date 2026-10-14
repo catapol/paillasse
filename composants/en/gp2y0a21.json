@@ -1,0 +1,87 @@
+{
+  "format": "paillasse-composant",
+  "version": 1,
+  "id": "gp2y0a21",
+  "nom": "Sharp GP2Y0A21YK0F",
+  "description": "Infrared distance sensor 10 to 80 cm, non-linear analog output",
+  "categorie": "Sensors",
+  "repere": "IR",
+  "sources": [
+    "Sharp GP2Y0A21YK0F, datasheet: range 10 to 80 cm; supply 4.5 to 5.5 V; current 30 mA typical",
+    "Output curve (read from the datasheet graph): about 2.3 V at 10 cm and 0.4 V at 80 cm. Approximated here by V = 33.9 / (d + 4.74), d in cm, which goes through these two points; intermediate values to be checked (about 0.98 V at 30 cm)",
+    "Measurement period 38.3 ms ± 9.6 ms"
+  ],
+  "broches": [
+    {
+      "nom": "vcc",
+      "libelle": "Vcc",
+      "cote": "gauche"
+    },
+    {
+      "nom": "gnd",
+      "libelle": "GND",
+      "cote": "gauche"
+    },
+    {
+      "nom": "vo",
+      "libelle": "Vo",
+      "cote": "droite"
+    }
+  ],
+  "parametres": [
+    {
+      "nom": "periode",
+      "libelle": "Measurement period",
+      "unite": "s",
+      "defaut": 0.0383,
+      "min": 0.001
+    },
+    {
+      "nom": "courant",
+      "libelle": "Current drawn",
+      "unite": "A",
+      "defaut": 0.03,
+      "min": 0
+    }
+  ],
+  "alimentation": {
+    "plus": "vcc",
+    "moins": "gnd",
+    "min": 4.5,
+    "max": 5.5
+  },
+  "monde": {
+    "mesure": "distance",
+    "portee_m": 1.5,
+    "ouverture_deg": 5,
+    "defaut": 0.3
+  },
+  "equations": [
+    "d_cm = sat(distance * 100, 10, 80)",
+    "v_mesure = echantillon(33.9 / (d_cm + 4.74), periode)",
+    "vsortie = si(alim_ok, v_mesure, 0)"
+  ],
+  "elements": [
+    {
+      "type": "I",
+      "entre": [
+        "vcc",
+        "gnd"
+      ],
+      "valeur": "si(v_alim > 1, courant, 0)"
+    },
+    {
+      "type": "V",
+      "entre": [
+        "vo",
+        "gnd"
+      ],
+      "valeur": "vsortie",
+      "r": 100
+    }
+  ],
+  "affichage": [
+    "distance",
+    "vsortie"
+  ]
+}
